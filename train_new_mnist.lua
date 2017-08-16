@@ -403,8 +403,8 @@ while true do
     torch.save(('%s/model_best.t7'):format(opt.save), {netC=sanitize(netC), netD=sanitize(netD), netEC=sanitize(netEC), netEP=sanitize(netEP), opt=opt, epoch=epoch, best=best, total_iter=total_iter})
   else
     numEpochsSinceImprovement = numEpochsSinceImprovement + 1
-    if numEpochsSinceImprovement >= opt.numEpochsSinceImprovement then
-      print(('Validation MSE has not improved for %d iterations, quitting'):format(opt.numEpochsSinceImprovement))
+    if numEpochsSinceImprovement >= opt.patience then
+      print(('Validation MSE has not improved for %d iterations, quitting'):format(opt.patience))
       break
     end
   end
