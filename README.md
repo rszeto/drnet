@@ -37,3 +37,10 @@ Now you're ready to train the DrNet model by running:
 th train_drnet_skip --dataRoot /my/kth/data/path/ --imageSize 128 --nThreads 2
 ``` 
 Setting ```--nThreads``` utilizes multithreaded data loading and will speed up training significantly.
+
+
+## Random notes
+
+### Additional installations
+
+* DeepMind's HDF5 package: https://github.com/deepmind/torch-hdf5/blob/master/doc/usage.md

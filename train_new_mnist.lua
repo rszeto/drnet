@@ -21,9 +21,9 @@ opt = lapp[[
   --name             (default 'default')         checkpoint name
   --dataRoot         (default 'data/new_mnist')  data root directory
   --optimizer        (default 'adam')            optimizer to train with
-  --nEpochs          (default 200)               max training epochs  
+  --nEpochs          (default 1000)              max training epochs  
   --seed             (default 1)                 random seed  
-  --epochSize        (default 50000)             number of samples per epoch  
+  --epochSize        (default 10000)             number of samples per epoch  
   --contentDim       (default 64)                dimensionality of content vector
   --poseDim          (default 5)                 dimensionality of pose vector 
   --imageSize        (default 64)                size of image
@@ -41,6 +41,7 @@ opt = lapp[[
   --dataPool         (default 200)
   --dataWarmup       (default 10)
   --sliceName        (string)                    Name of the new MNIST slice to train on
+  --patience         (default 10)                Number of epochs to wait for before early stopping
 ]]  
 
 opt.save = ('%s/%s/%s'):format(opt.save, opt.dataset, opt.sliceName)
@@ -319,6 +320,10 @@ function train(x_cpu)
   return pred_mse, latent_mse
 end
 
+
+-------------- Actually run training ----------------------------------
+
+
 require 'data.data'
 
 plot_x_train = trainLoader:getBatch(opt.batchSize, opt.maxStep)
@@ -338,6 +343,10 @@ else
   total_iter = 0
 end
 epoch = start_epoch
+
+-- How many epochs since last MSE improvement
+local numEpochsSinceImprovement = 0
+
 while true do
   collectgarbage()
   collectgarbage()
@@ -389,8 +398,15 @@ while true do
 
   if pred_mse/iter < best then
     best = pred_mse / iter
+    numEpochsSinceImprovement = 0
     print(('Saving best model so far (pred mse = %.4f) %s/model_best.t7'):format(pred_mse/iter, opt.save))
     torch.save(('%s/model_best.t7'):format(opt.save), {netC=sanitize(netC), netD=sanitize(netD), netEC=sanitize(netEC), netEP=sanitize(netEP), opt=opt, epoch=epoch, best=best, total_iter=total_iter})
+  else
+    numEpochsSinceImprovement = numEpochsSinceImprovement + 1
+    if numEpochsSinceImprovement >= opt.numEpochsSinceImprovement then
+      print(('Validation MSE has not improved for %d iterations, quitting'):format(opt.numEpochsSinceImprovement))
+      break
+    end
   end
  
   -- plot 
