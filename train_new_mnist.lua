@@ -21,7 +21,7 @@ opt = lapp[[
   --name             (default 'default')         checkpoint name
   --dataRoot         (default 'data/new_mnist')  data root directory
   --optimizer        (default 'adam')            optimizer to train with
-  --nEpochs          (default 1000)              max training epochs  
+  --nEpochs          (default 300)               max training epochs  
   --seed             (default 1)                 random seed  
   --epochSize        (default 10000)             number of samples per epoch  
   --contentDim       (default 64)                dimensionality of content vector
@@ -41,7 +41,7 @@ opt = lapp[[
   --dataPool         (default 200)
   --dataWarmup       (default 10)
   --sliceName        (string)                    Name of the new MNIST slice to train on
-  --patience         (default 10)                Number of epochs to wait for before early stopping
+  --patience         (default 20)                Number of epochs to wait for before early stopping
 ]]  
 
 opt.save = ('%s/%s/%s'):format(opt.save, opt.dataset, opt.sliceName)
@@ -331,8 +331,6 @@ plot_x_val = valLoader:getBatch(opt.batchSize, opt.maxStep)
 
 test_log = io.open(('%s/test.log'):format(opt.save), 'a')
 train_log = io.open(('%s/train.log'):format(opt.save), 'a')
-test_log:write(('pred_mse\tlatent_mse\tscene_disc_nll\tscene_disc_acc\n'))
-train_log:write(('pred_mse\tlatent_mse\tscene_disc_nll\tscene_disc_acc\n'))
 
 if checkpoint then
   best = checkpoint.best
@@ -343,6 +341,8 @@ else
   best = 1e10
   start_epoch = 0 
   total_iter = 0
+  test_log:write(('pred_mse\tlatent_mse\tscene_disc_nll\tscene_disc_acc\n'))
+  train_log:write(('pred_mse\tlatent_mse\tscene_disc_nll\tscene_disc_acc\n'))
 end
 epoch = start_epoch
 
