@@ -21,7 +21,7 @@ opt = lapp[[
   --name             (default 'default')         checkpoint name
   --dataRoot         (default 'data/new_mnist')  data root directory
   --optimizer        (default 'adam')            optimizer to train with
-  --nEpochs          (default 300)               max training epochs  
+  --nEpochs          (default 500)               max training epochs  
   --seed             (default 1)                 random seed  
   --epochSize        (default 10000)             number of samples per epoch  
   --contentDim       (default 64)                dimensionality of content vector
