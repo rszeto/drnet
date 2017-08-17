@@ -331,6 +331,8 @@ plot_x_val = valLoader:getBatch(opt.batchSize, opt.maxStep)
 
 test_log = io.open(('%s/test.log'):format(opt.save), 'a')
 train_log = io.open(('%s/train.log'):format(opt.save), 'a')
+test_log:write(('pred_mse\tlatent_mse\tscene_disc_nll\tscene_disc_acc\n'))
+train_log:write(('pred_mse\tlatent_mse\tscene_disc_nll\tscene_disc_acc\n'))
 
 if checkpoint then
   best = checkpoint.best
