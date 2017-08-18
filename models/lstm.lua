@@ -26,7 +26,7 @@ local function lstm_layer(x, prev_c, prev_h)
   return next_c, next_h
 end
 
-function makeLSTM()
+function makeLSTM(base, nPast, nFuture)
   local pose             = nn.Identity()()
   local content           = nn.Identity()()
   local prev_s           = nn.Identity()()
@@ -49,18 +49,20 @@ function makeLSTM()
     gen_pose = nn.Tanh()(nn.Linear(opt.rnnSize, opt.poseDim)(i[opt.rnnLayers]))
   end
 
-  base = nn.gModule({pose, content, prev_s}, {gen_pose, nn.Identity()(next_s)})
+  base = base or nn.gModule({pose, content, prev_s}, {gen_pose, nn.Identity()(next_s)})
   initModel(base)
   base:cuda()
   params, grads = base:getParameters()
 
   lstm = {}
+  lstm.nPast = nPast
+  lstm.nFuture = nFuture
   lstm.params, lstm.grads = params, grads
-  lstm.clones = clone_many(base, opt.T)
+  lstm.clones = clone_many(base, lstm.nPast+lstm.nFuture)
   lstm.base = base
   lstm.s = {}
   lstm.ds = {}
-  for j = 0, opt.nPast+opt.nFuture do
+  for j = 0, lstm.nPast+lstm.nFuture do
     lstm.s[j] = {}
     for d = 1, 2 * opt.rnnLayers do
       lstm.s[j][d] = torch.CudaTensor(opt.batchSize, opt.rnnSize):fill(0)
@@ -85,7 +87,7 @@ function makeLSTM()
   function lstm:fp_obs(pose, content)
     self:reset_state()
     local gen_pose = {}
-    for i = 1, opt.nPast+opt.nFuture do
+    for i = 1, self.nPast+self.nFuture do
       local s = self.s[i - 1]
       gen_pose[i], self.s[i] = unpack(self.clones[i]:forward({pose[i], content, s}))
     end
@@ -96,9 +98,9 @@ function makeLSTM()
     self:reset_state()
     local gen_pose = {}
     local in_pose = {}
-    for i = 1, opt.nPast+opt.nFuture do
+    for i = 1, self.nPast+self.nFuture do
       local s = self.s[i - 1]
-      if i <= opt.nPast then
+      if i <= self.nPast then
         in_pose[i] = pose[i]:clone()
       else
         in_pose[i] = gen_pose[i-1]:clone()
@@ -111,7 +113,7 @@ function makeLSTM()
   function lstm:bp(pose, content, dgen_pose)
     self:reset_ds()
     local ds = {}
-    for i = opt.nPast+opt.nFuture, 1, -1 do
+    for i = self.nPast+self.nFuture, 1, -1 do
       local s = self.s[i - 1]
       local _, _, ds = unpack(self.clones[i]:backward({pose[i], content, s}, {dgen_pose[i], self.ds}))
       replace_table(self.ds, ds)

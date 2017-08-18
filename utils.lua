@@ -263,3 +263,11 @@ function find_index(t, e)
   end
 end
 
+function shuffle_table(input)
+  -- From http://www.programming-idioms.org/idiom/10/shuffle-a-list/1313/lua
+  for i=#input, 2, -1 do
+    local j = math.random(i)
+    input[i], input[j] = input[j], input[i]
+  end
+  return input
+end

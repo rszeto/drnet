@@ -68,7 +68,7 @@ torch.manualSeed(opt.seed)
 cutorch.manualSeed(opt.seed)
 math.randomseed(opt.seed)
 
-opt.modelPath = opt.modelRoot .. '/model.t7'
+opt.modelPath = opt.modelRoot .. '/model_best.t7'
 local nets = torch.load(opt.modelPath)
 
 opt.nShare = nets.opt.nShare

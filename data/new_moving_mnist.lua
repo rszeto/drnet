@@ -2,6 +2,7 @@ require 'torch'
 require 'paths'
 require 'image'
 require 'hdf5'
+require 'utils'
 
 local NewMovingMNISTDataset = torch.class('NewMovingMNISTLoader')
 
@@ -27,6 +28,14 @@ function NewMovingMNISTDataset:__init(opt, data_type)
   self.data = torch.Tensor(data:size())
   self.data:copy(data)
   self.N = self.data:size(1)
+
+  -- Fields for tracking video selection
+  self.videoListIdx = 1
+  self.shuffle = (data_type == 'train' or data_type == 'val')
+  self.videoList = {}
+  for k=1, self.N do
+    table.insert(self.videoList, k)
+  end
 end
 
 function NewMovingMNISTDataset:size()
@@ -40,12 +49,24 @@ end
 local dirs = {4, -3, -2, -1, 1, 2, 3, 4}
 
 function NewMovingMNISTDataset:getSequence(x)
+  -- Shuffle list of video IDs
+  if self.videoListIdx == 1 and self.shuffle then
+    shuffle_table(self.videoList)
+  end
+
+  -- Get video data
   local t = x:size(1)
-  -- Get random video
-  local idx = math.random(self.N)
+  local idx = self.videoList[self.videoListIdx]
   local frames = self.data[{ idx, {1, t}, {}, {} }]
   -- Populate tensor with video data
   x:copy(frames)
+
+  -- Increment index into the video list
+  if self.videoListIdx == self.N - 1 then
+    self.videoListIdx = self.N
+  else
+    self.videoListIdx = math.fmod(self.videoListIdx, self.N) + 1
+  end
 end
 
 function NewMovingMNISTDataset:getBatch(n, T)
