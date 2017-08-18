@@ -104,7 +104,7 @@ netEC:training()
 netEP:training()
 
 require 'models.lstm'
-lstm = makeLSTM()
+lstm = makeLSTM(nil, opt.nPast, opt.nFuture)
 
 local criterion = {}
 for i=1,opt.nPast+opt.nFuture do
