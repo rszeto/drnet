@@ -22,6 +22,7 @@ from functools import partial
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 MNIST_DATA_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, '..', 'data', 'new_mnist'))
 TRAIN_TORONTO_PATH = os.path.abspath(os.path.join(SCRIPT_DIR, '..', 'train_new_mnist.lua'))
+TRAIN_LSTM_PATH = os.path.abspath(os.path.join(SCRIPT_DIR, '..', 'train_lstm_new_mnist.lua'))
 DRNET_ROOT_DIR = os.path.abspath(os.path.join(SCRIPT_DIR, '..'))
 
 
@@ -65,7 +66,7 @@ def launch_job(t, num_gpus):
             gpu_id = gpu_id + 1 % num_gpus
 
 
-def main(num_gpus, slice_names_file):
+def main(num_gpus, slice_names_file, lstm):
     os.chdir(DRNET_ROOT_DIR)
     if slice_names_file is None:
         raise ValueError('Path to slice names file must be provided')
@@ -76,8 +77,10 @@ def main(num_gpus, slice_names_file):
         slice_names = filter(lambda x: len(x) > 0 and not x.startswith('#'), slice_names)
         video_file_paths = [os.path.join(MNIST_DATA_DIR, '%s_videos.h5' % slice_name) for slice_name in slice_names]
 
-    # cmd_fmt = 'th %s --sliceName %%s --K 10 --T 5' % TRAIN_TORONTO_PATH
-    cmd_fmt = 'th %s --sliceName %%s --nEpochs 100' % TRAIN_TORONTO_PATH
+    if lstm:
+        cmd_fmt = 'th %s --sliceName %%s --nPast 10 --nFuture 5' % TRAIN_LSTM_PATH
+    else:
+        cmd_fmt = 'th %s --sliceName %%s' % TRAIN_TORONTO_PATH
     dataset_labels = [re.search('.*/(.*)_videos\.h5', path).group(1) for path in video_file_paths]
     cmds = [cmd_fmt % dataset_label for dataset_label in dataset_labels][::-1]
 
@@ -101,5 +104,7 @@ if __name__ == '__main__':
     parser.add_argument('--slice_names_file', type=str,
                         default=os.path.join(SCRIPT_DIR, 'slice_names.txt'),
                         help='File path to list of MNIST slice names')
+    parser.add_argument('--lstm', action='store_true',
+                        help='Flag to train LSTM on top of trained DRNet')
     args = parser.parse_args()
     main(**vars(args))
