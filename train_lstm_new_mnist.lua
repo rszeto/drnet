@@ -82,6 +82,10 @@ opt.movingDigits = nets.opt.movingDigits
 
 
 require 'data.data'
+trainLoader = NewMovingMNISTLoader(opt or opt_t, 'train')
+trainLoader:normalize()
+valLoader = NewMovingMNISTLoader(opt or opt_t, 'val')
+valLoader:normalize()
 
 local netEC = nets['netEC']
 local netEP = nets['netEP']

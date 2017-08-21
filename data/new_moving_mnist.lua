@@ -109,8 +109,3 @@ function NewMovingMNISTDataset:plot()
   os.execute('mkdir -p ' .. savedir)
   self:plotSeq(savedir .. '/seq.png')
 end
-
-trainLoader = NewMovingMNISTLoader(opt or opt_t, 'train')
-trainLoader:normalize()
-valLoader = NewMovingMNISTLoader(opt or opt_t, 'val')
-valLoader:normalize()
