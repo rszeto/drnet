@@ -120,15 +120,14 @@ def main_cpu(data_model_pairs_file):
     long_cmd_fmt = 'python %s --modelSliceName=%%s --dataSliceName=%%s_long --numFutureFrames=490' % GENERATE_RESULTS_PATH
     cmds = [cmd_fmt % pair for pair in data_model_pairs]
     cmds += [long_cmd_fmt % pair for pair in data_model_pairs]
-    pprint(cmds)
-    # res = pool.map_async(launch_cpu_job, enumerate(cmds))
-    # try:
-    #     # Set timeout to avoid hanging on interrupt
-    #     res.get(9999999)
-    # except KeyboardInterrupt:
-    #     pass
-    # except Exception:
-    #     traceback.print_exc()
+    res = pool.map_async(launch_cpu_job, enumerate(cmds))
+    try:
+        # Set timeout to avoid hanging on interrupt
+        res.get(9999999)
+    except KeyboardInterrupt:
+        pass
+    except Exception:
+        traceback.print_exc()
 
 
 if __name__ == '__main__':
