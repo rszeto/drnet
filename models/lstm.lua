@@ -49,8 +49,10 @@ function makeLSTM(base, nPast, nFuture)
     gen_pose = nn.Tanh()(nn.Linear(opt.rnnSize, opt.poseDim)(i[opt.rnnLayers]))
   end
 
-  base = base or nn.gModule({pose, content, prev_s}, {gen_pose, nn.Identity()(next_s)})
-  initModel(base)
+  if not base then
+    base = nn.gModule({pose, content, prev_s}, {gen_pose, nn.Identity()(next_s)})
+    initModel(base)
+  end
   base:cuda()
   params, grads = base:getParameters()
 

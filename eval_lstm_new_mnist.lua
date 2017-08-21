@@ -284,12 +284,11 @@ print('Generating short-term predictions')
 local lstmModelPath = (opt.lstmModelFmt):format(opt.modelSliceName, opt.name)
 local lstmNets = torch.load(lstmModelPath)
 lstmBase = lstmNets['lstm']
-lstm = makeLSTM(lstmBase:clone(), opt.nPast, opt.nFuture)
+lstm = makeLSTM(lstmBase, opt.nPast, opt.nFuture)
 
 for firstVidIdx=1, testLoader.N, opt.batchSize do
   local batch = testLoader:getBatch(opt.batchSize, opt.nPast+opt.nFuture)
   draw(batch, firstVidIdx, opt.nPast, opt.nFuture, saveTestImagesRoot)
-  break
 end
 
 print('Generating long-term predictions')
@@ -297,5 +296,4 @@ lstm = makeLSTM(lstmBase:clone(), opt.nPast, opt.nFutureLong)
 for firstVidIdx=1, longLoader.N, opt.batchSize do
   local batch = longLoader:getBatch(opt.batchSize, opt.nPast+opt.nFutureLong)
   draw(batch, firstVidIdx, opt.nPast, opt.nFutureLong, saveLongImagesRoot)
-  break
 end
