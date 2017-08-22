@@ -297,3 +297,4 @@ for firstVidIdx=1, longLoader.N, opt.batchSize do
   local batch = longLoader:getBatch(opt.batchSize, opt.nPast+opt.nFutureLong)
   draw(batch, firstVidIdx, opt.nPast, opt.nFutureLong, saveLongImagesRoot)
 end
+os.exit()
