@@ -329,6 +329,7 @@ trainLoader = NewMovingMNISTLoader(opt or opt_t, 'train')
 trainLoader:normalize()
 valLoader = NewMovingMNISTLoader(opt or opt_t, 'val')
 valLoader:normalize()
+valLoader:plot()
 
 plot_x_train = trainLoader:getBatch(opt.batchSize, opt.maxStep)
 plot_x_val = valLoader:getBatch(opt.batchSize, opt.maxStep)

@@ -34,5 +34,4 @@ if opt.nThreads > 0 then
   cutorch.synchronize()
 else
   require(('data.%s'):format(opt.dataset))
-  valLoader:plot()
 end
