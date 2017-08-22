@@ -41,7 +41,7 @@ opt = lapp[[
   --modelRootFmt     (default 'logs/new_moving_mnist/%s')
   --trainOnPreds     (default true)              Whether to propagate predicted poses during training
   --testOnPreds      (default true)              Whether to propagate predicted poses during testing
-  --patience         (default 20)                Number of epochs to wait for before early stopping
+  --patience         (default 50)                Number of epochs to wait for before early stopping
 ]]
 
 opt.modelRoot = (opt.modelRootFmt):format(opt.sliceName)
@@ -211,13 +211,13 @@ function plot(x_seq, fname, epoch, iter)
       table.insert(to_plot, gens[j][i])
     end
 
-    -- -- plot frame generated from GT pose
-    -- for j=1, opt.nPast do
-    --   table.insert(to_plot, x_seq[j][i])
-    -- end
-    -- for j=1, opt.nFuture do
-    --   table.insert(to_plot, gens_gt[j][i])
-    -- end
+    -- plot frame generated from GT pose
+    for j=1, opt.nPast do
+      table.insert(to_plot, x_seq[j][i])
+    end
+    for j=1, opt.nFuture do
+      table.insert(to_plot, gens_gt[j][i])
+    end
 
     -- plot ground truth sequence
     for j=1, opt.nPast do

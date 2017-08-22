@@ -66,7 +66,7 @@ def launch_job(t, num_gpus):
             gpu_id = gpu_id + 1 % num_gpus
 
 
-def main(num_gpus, slice_names_file, lstm):
+def main(num_gpus, slice_names_file, lstm, gt):
     os.chdir(DRNET_ROOT_DIR)
     if slice_names_file is None:
         raise ValueError('Path to slice names file must be provided')
@@ -78,7 +78,10 @@ def main(num_gpus, slice_names_file, lstm):
         video_file_paths = [os.path.join(MNIST_DATA_DIR, '%s_videos.h5' % slice_name) for slice_name in slice_names]
 
     if lstm:
-        cmd_fmt = 'th %s --sliceName %%s --nPast 10 --nFuture 5' % TRAIN_LSTM_PATH
+        if gt:
+            cmd_fmt = 'th %s --sliceName %%s --nPast 10 --nFuture 5 --trainOnPreds false --name gt_pose' % TRAIN_LSTM_PATH
+        else:
+            cmd_fmt = 'th %s --sliceName %%s --nPast 10 --nFuture 5' % TRAIN_LSTM_PATH
     else:
         cmd_fmt = 'th %s --sliceName %%s' % TRAIN_TORONTO_PATH
     dataset_labels = [re.search('.*/(.*)_videos\.h5', path).group(1) for path in video_file_paths]
@@ -106,5 +109,7 @@ if __name__ == '__main__':
                         help='File path to list of MNIST slice names')
     parser.add_argument('--lstm', action='store_true',
                         help='Flag to train LSTM on top of trained DRNet')
+    parser.add_argument('--gt', action='store_true',
+                        help='Flag to train LSTM with GT poses')
     args = parser.parse_args()
     main(**vars(args))
