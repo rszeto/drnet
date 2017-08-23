@@ -29,7 +29,7 @@ opt = lapp[[
   --normalize                                    if set normalize predicted pose vectors to have unit norm
   --rnnSize          (default 256)
   --rnnLayers        (default 2)
-  --nThreads         (default 5)                 number of dataloading threads
+  --nThreads         (default 0)                 number of dataloading threads
   --dataPool         (default 200)
   --dataWarmup       (default 10)
   --nPast            (default 10)                number of frames to condition on.  
