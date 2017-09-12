@@ -37,7 +37,7 @@ opt = lapp[[
   --model            (default 'dcgan')
   --decoder          (default 'dcgan')
   --depth            (default 18)                depth of resnet 
-  --nThreads         (default 5)                 number of dataloading threads
+  --nThreads         (default 0)                 number of dataloading threads
   --dataPool         (default 200)
   --dataWarmup       (default 10)
   --sliceName        (string)                    Name of the new MNIST slice to train on
